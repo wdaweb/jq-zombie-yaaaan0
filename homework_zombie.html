@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html {
+        background: url(./images/13.jpg) no-repeat;
+        font-family: "Press Start 2P", cursive;
+      }
+      #bg {
+        width: 600px;
+        height: 700px;
+        background-color: rgba(236, 230, 230, 0.3);
+        margin: auto;
+        margin-top: 50px;
+      }
+
+      #text {
+        margin: auto;
+        /* text-align: center; */
+      }
+
+      #game {
+        width: 600px;
+        height: 700px;
+        overflow: hidden;
+        position: relative;
+      }
+      #game img {
+        position: absolute;
+        /* height: 100px;
+        width: auto; */
+      }
+
+      table {
+        /* border: 1px solid #000000; */
+        margin: auto;
+        width: 600px;
+      }
+      input {
+        width: 200px;
+        height: 30px;
+        border: 0px;
+        border-radius: 30px;
+        background: rgb(10, 2, 1);
+        color: cornsilk;
+        font-family: "Press Start 2P", cursive;
+        box-shadow: 1px 2px 6px 1px #4686b1;
+      }
+      span {
+        font-size: 25px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="bg">
+      <div id="game"></div>
+    </div>
+    <br />
+    <div id="text">
+      <table>
+        <tr>
+          <td rowspan="2">
+            <input type="button" value="START" id="btn-start" />
+          </td>
+          <td>score-</td>
+          <td>time-</td>
+        </tr>
+        <tr>
+          <td>$ &nbsp;<span id="text-score">0</span></td>
+          <td>&nbsp;<span id="text-time">30</span></td>
+        </tr>
+      </table>
+    </div>
+    <script src="./jquery-3.5.1.min.js"></script>
+    <script>
+      let score = 0;
+      let timeleft = 30;
+
+      let id = 0;
+
+      const coin_S= new Audio()
+      coin_S.src='./coin.mp3'
+      const rand = (num) => {
+        return Math.floor(Math.random() * num);
+      };
+
+      const moveballoon = (id) => {
+        $(`.balloon${id}`).animate(
+          {
+            left: rand(70) + "%",
+            top: rand(70) + "%",
+          },
+          3000,
+          function () {
+            moveballoon(id);
+          }
+        );
+      };
+
+      // const movesss = (id) => {
+      //   $(`#sss${id}`).animate(
+      //     {
+      //       left: rand(100) + "%",
+      //       top: rand(100) + "%",
+      //       right: rand(100) + "%",
+      //       bottom: rand(100) + "%",
+      //     },
+      //     1000,
+      //     function () {
+      //       movesss(id);
+      //     }
+      //   );
+      // };
+
+      $("#btn-start").click(function () {
+        $(this).attr("disabled", true);
+        score = 0;
+        $("#text-score").text(score);
+        timeleft = 30;
+        $("#text-time").text(timeleft);
+
+        let timer = setInterval(function () {
+          // 修改秒數
+          timeleft--;
+          $("#text-time").text(timeleft);
+
+          if (timeleft === 0) {
+            clearInterval(timer);
+            $("#btn-start").attr("disabled", false);
+            $("#game img").remove();
+            setTimeout(() => {
+              alert(`時間到 你得到了 ${score} 元`);
+            }, 50);
+          } else {
+            //每秒隨機出現鈔票
+            if (rand(10) > 2) {
+              $("#game").append(
+                `<img src="./images/xt.gif" class="balloon${id}"> `
+              );
+              $(`.balloon${id}`).css({
+                left: rand(70) + "%",
+                top: rand(70) + "%",
+              });
+              moveballoon(id);
+              id++;
+            }
+
+            // 每秒隨機出現寶箱
+            if (rand(10) > 8) {
+              $("#game").append(
+                `<img src="./images/sss.gif" class="sss${id}"> `
+              );
+              $(`.sss${id}`).css({
+                left: rand(70) + "%",
+                top: rand(70) + "%",
+              });
+              // movesss(id);
+              id++;
+            }
+          }
+        }, 1000);
+      });
+
+      // console.log(`#sss${id}`);
+
+      // $(`#sss${id}`).click(
+      //   function () {
+      //     $(`#sss${id}`).attr("src", "./images/star.gif");
+      //     score = score + 100;
+      //     $("#text-score").text(score);
+      //     console.log(this);
+      //   }
+      // );
+
+      $("#game").on("click", "img", function () {
+
+
+        if ($(this).attr("src") === "./images/sss.gif") {
+
+          let p=$('<p>')
+            p.html=('+100')
+          $(this).attr("src", "./images/star.gif").append(p);
+          // $("#game").append(`<p></p>`);
+          $(this).stop(true, false);
+          $(this).css("pointer-events", "none");
+          $(this).fadeOut("slow");
+          // $("p").text("$100").css("color", "#ffffff").slideDown("slow");
+          // $("p").stop(true, false);
+          // $("p").hide();
+
+          coin_S.play()
+
+          score = score + 100;
+          $("#text-score").text(score);
+        } else {
+
+          let p=$('<p>')
+            p.html=('+10')
+          $(this).attr("src", "./images/star.gif").append(p);
+          $(this).attr("src", "./images/coin1.gif");
+
+          // $("#game").append(`<p></p>`);
+          $(this).stop(true, false);
+          $(this).css("pointer-events", "none");
+          $(this).fadeOut("slow");
+          $("p").text("$10").css("color", "#ffffff").slideDown("slow");
+          // $("p").stop(true, false);
+          // $("p").hide();
+
+          coin_S.play()
+
+          score = score + 10;
+          $("#text-score").text(score);
+        }
+
+        console.log(this);
+      });
+    </script>
+  </body>
+</html>
